@@ -10,4 +10,10 @@ public interface LoginService {
      */
     ResponseResult login(User user);
 
+    /**
+     * 用户退出
+     * @return
+     */
+    ResponseResult logout();
+
 }

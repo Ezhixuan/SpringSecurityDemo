@@ -6,15 +6,15 @@ import com.ezhixuan.springSecurityDemo.domain.entitiy.User;
 import com.ezhixuan.springSecurityDemo.service.LoginService;
 import com.ezhixuan.springSecurityDemo.utils.JwtUtil;
 import com.ezhixuan.springSecurityDemo.utils.RedisCache;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Resource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 /**
  * @program: SpringSecurityDemo
@@ -50,5 +50,21 @@ public class LoginServiceImpl implements LoginService {
     Map<String, String> map = new HashMap<>();
     map.put("token", jwt);
     return new ResponseResult(200, "登录成功", map);
+  }
+
+  /**
+   * 用户退出
+   *
+   * @return
+   */
+  @Override
+  public ResponseResult logout() {
+    // 从contextHolder中获取loginUser信息
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+    // 到redis中删除对应User的信息
+    String userId = loginUser.getUser().getId().toString();
+    redisCache.deleteObject("login:" + userId);
+    return new ResponseResult(200, "退出成功");
   }
 }
