@@ -1,6 +1,7 @@
 package com.ezhixuan.springSecurityDemo.config;
 
 import com.ezhixuan.springSecurityDemo.filter.JWTAuthenticationTokenFilter;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +12,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import javax.annotation.Resource;
 
 /**
  * @program: SpringSecurityDemo
@@ -28,6 +29,8 @@ import javax.annotation.Resource;
 public class SpringSecurityConfig {
 
   @Resource private JWTAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+  @Resource private AccessDeniedHandler accessDeniedHandler;
+  @Resource private AuthenticationEntryPoint authenticationEntryPoint;
 
   /**
    * 密码加密
@@ -64,6 +67,10 @@ public class SpringSecurityConfig {
         .authenticated();
     // 添加token校验过滤器到过滤器链中
     http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+    // 添加自定义异常处理器
+    http.exceptionHandling()
+        .accessDeniedHandler(accessDeniedHandler)
+        .authenticationEntryPoint(authenticationEntryPoint);
     return http.build();
   }
 
