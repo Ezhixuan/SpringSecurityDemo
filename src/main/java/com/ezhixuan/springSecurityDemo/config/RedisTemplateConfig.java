@@ -3,6 +3,7 @@ package com.ezhixuan.springSecurityDemo.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
@@ -47,6 +48,10 @@ public class RedisTemplateConfig {
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.NON_FINAL,
                 JsonTypeInfo.As.WRAPPER_ARRAY);
+
+        // 解决使用springSecurity时继承UserDetails的类需要重新的方法包含一些属性无法正常序列化
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
 
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
