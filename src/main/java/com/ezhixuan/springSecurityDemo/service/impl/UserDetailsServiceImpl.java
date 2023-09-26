@@ -4,13 +4,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ezhixuan.springSecurityDemo.domain.entitiy.LoginUser;
 import com.ezhixuan.springSecurityDemo.domain.entitiy.User;
 import com.ezhixuan.springSecurityDemo.mapper.UserMapper;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Resource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.Objects;
 
 /**
  * @program: SpringSecurityDemo
@@ -45,7 +47,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new RuntimeException("用户名或密码错误");
         }
         // Xuan TODO 查询对应的权限信息
-        LoginUser loginUser = new LoginUser(user);
+        List<String> list = new ArrayList<>(Arrays.asList("test"));
+        LoginUser loginUser = new LoginUser(user,list);
         return loginUser;
     }
 }

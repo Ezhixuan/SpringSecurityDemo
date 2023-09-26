@@ -66,7 +66,8 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
       throw new RuntimeException("用户未登录");
     }
     // 存入SecurityContextHolder
-    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, null);
+    // Xuan TODO 用户权限
+    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     // 放行
     filterChain.doFilter(request,response);
