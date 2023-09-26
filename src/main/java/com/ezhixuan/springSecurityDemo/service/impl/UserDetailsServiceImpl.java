@@ -3,9 +3,8 @@ package com.ezhixuan.springSecurityDemo.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ezhixuan.springSecurityDemo.domain.entitiy.LoginUser;
 import com.ezhixuan.springSecurityDemo.domain.entitiy.User;
+import com.ezhixuan.springSecurityDemo.mapper.MenuMapper;
 import com.ezhixuan.springSecurityDemo.mapper.UserMapper;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Resource;
@@ -25,6 +24,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Resource
     private UserMapper userMapper;
+    
+    @Resource
+    private MenuMapper menuMapper;
 
     /**
      * Locates the user based on the username. In the actual implementation, the search
@@ -46,9 +48,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (Objects.isNull(user)){
             throw new RuntimeException("用户名或密码错误");
         }
-        // Xuan TODO 查询对应的权限信息
-        List<String> list = new ArrayList<>(Arrays.asList("test"));
-        LoginUser loginUser = new LoginUser(user,list);
+        List<String> permissions = menuMapper.selectPermsByUserId(user.getId());
+        LoginUser loginUser = new LoginUser(user,permissions);
         return loginUser;
     }
 }

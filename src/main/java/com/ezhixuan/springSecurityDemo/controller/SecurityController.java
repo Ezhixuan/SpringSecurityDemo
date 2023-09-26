@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/demo")
 public class SecurityController {
 
-    @PreAuthorize("hasAuthority('test')")
+    @PreAuthorize("hasAuthority('sys:test:list')")
     @GetMapping("test")
     public String demoTest(){
         return "hello";
