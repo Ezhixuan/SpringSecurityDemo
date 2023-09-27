@@ -15,7 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 /**
  * @program: SpringSecurityDemo
@@ -31,6 +34,9 @@ public class SpringSecurityConfig {
   @Resource private JWTAuthenticationTokenFilter jwtAuthenticationTokenFilter;
   @Resource private AccessDeniedHandler accessDeniedHandler;
   @Resource private AuthenticationEntryPoint authenticationEntryPoint;
+  @Resource private AuthenticationSuccessHandler authenticationSuccessHandler;
+  @Resource private AuthenticationFailureHandler authenticationFailureHandler;
+  @Resource private LogoutSuccessHandler logoutSuccessHandler;
 
   /**
    * 密码加密
@@ -71,6 +77,11 @@ public class SpringSecurityConfig {
     http.exceptionHandling()
         .accessDeniedHandler(accessDeniedHandler)
         .authenticationEntryPoint(authenticationEntryPoint);
+    // 添加允许跨域
+    http.cors();
+    // 添加自定义处理器
+    http.formLogin().successHandler(authenticationSuccessHandler).failureHandler(authenticationFailureHandler);
+    http.logout().logoutSuccessHandler(logoutSuccessHandler);
     return http.build();
   }
 

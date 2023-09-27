@@ -27,23 +27,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
 
   @Resource private RedisCache redisCache;
-
-  /**
-   * Same contract as for {@code doFilter}, but guaranteed to be just invoked once per request
-   * within a single request thread. See {@link #shouldNotFilterAsyncDispatch()} for details.
-   *
-   * <p>Provides HttpServletRequest and HttpServletResponse arguments instead of the default
-   * ServletRequest and ServletResponse ones.
-   *
-   * @param request
-   * @param response
-   * @param filterChain
-   */
+  
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    // 获取token
+    // 1. 获取token
     String token = request.getHeader("token");
     if (!StringUtils.hasText(token)) {
       // token 不存在
@@ -51,7 +40,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
       return;
     }
     // token 存在
-    // 解析token
+    // 2. 解析token
     String userId;
     try {
       Claims claims = JwtUtil.parseJWT(token);
@@ -60,15 +49,15 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
       e.printStackTrace();
       throw new RuntimeException("token非法");
     }
-    // 从redis中获取用户信息
+    // 3. 从redis中获取用户信息
     LoginUser loginUser = redisCache.getCacheObject("login:" + userId);
     if (Objects.isNull(loginUser)){
       throw new RuntimeException("用户未登录");
     }
-    // 存入SecurityContextHolder
+    // 4. 存入SecurityContextHolder
     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-    // 放行
+    // 5. 放行
     filterChain.doFilter(request,response);
   }
 }

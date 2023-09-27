@@ -37,16 +37,20 @@ public class LoginServiceImpl implements LoginService {
   @Override
   public ResponseResult login(User user) {
 
+    // 1. 通过authenticationManager进行登录验证
     UsernamePasswordAuthenticationToken token =
         new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword());
     Authentication authenticate = authenticationManager.authenticate(token);
     if (Objects.isNull(authenticate)) {
+      // 2. 如果验证失败，抛出异常
       throw new RuntimeException("登录失败");
     }
+    // 3. 如果验证成功，将用户信息存入redis中
     LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
     String userId = loginUser.getUser().getId().toString();
     String jwt = JwtUtil.createJWT(userId);
     redisCache.setCacheObject("login:" + userId, loginUser);
+    // 4. 将token返回给前端
     Map<String, String> map = new HashMap<>();
     map.put("token", jwt);
     return new ResponseResult(200, "登录成功", map);
@@ -59,10 +63,10 @@ public class LoginServiceImpl implements LoginService {
    */
   @Override
   public ResponseResult logout() {
-    // 从contextHolder中获取loginUser信息
+    // 1. 从contextHolder中获取loginUser信息
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-    // 到redis中删除对应User的信息
+    // 2. 到redis中删除对应User的信息
     String userId = loginUser.getUser().getId().toString();
     redisCache.deleteObject("login:" + userId);
     return new ResponseResult(200, "退出成功");
